@@ -16,6 +16,8 @@ public class ObjectGrabber : MonoBehaviour
     private Rigidbody heldObject;
 
     private bool isHolding = false;
+
+    private InteractibleObjects currentHighLight;
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void FixedUpdate()
     {
@@ -25,7 +27,7 @@ public class ObjectGrabber : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        
+        UpdateHighLight();
     }
 
     void TryGrab()
@@ -38,8 +40,10 @@ public class ObjectGrabber : MonoBehaviour
         if (Physics.Raycast(ray, out hit, grabRange))
         {
             InteractibleObjects interactible = hit.collider.GetComponent<InteractibleObjects>();
+            Debug.Log("Grabbed" + interactible);
             if (interactible != null)
             {
+                Debug.Log("interactible does not equal null");
                 heldObject = hit.collider.GetComponent<Rigidbody>();
                 if (heldObject != null)
                 {
@@ -49,6 +53,9 @@ public class ObjectGrabber : MonoBehaviour
                     
                     heldObject.linearVelocity = Vector3.zero;
                     heldObject.angularVelocity = Vector3.zero;
+
+                    interactible.UnhighLight();
+                    currentHighLight = null;
 
                     isHolding = true;
                     Debug.Log($"Grabbed{heldObject.name}");
@@ -96,10 +103,42 @@ public class ObjectGrabber : MonoBehaviour
     {
         if(isHolding) DropObject();
         else TryGrab();
+        
+        Debug.Log("Grabbed");
     }
 
     public void OnThrowPerformed(InputAction.CallbackContext context)
     {
         if(isHolding) ThrowObject();
+    }
+
+    void UpdateHighLight()
+    {
+        if (isHolding) return;
+        
+        Ray ray = new Ray(transform.position, transform.forward);
+        RaycastHit hit;
+        Debug.DrawRay(transform.position, transform.forward * grabRange, Color.red);
+
+        if (Physics.Raycast(ray, out hit, grabRange))
+        {
+            InteractibleObjects interactible = hit.collider.GetComponent<InteractibleObjects>();
+            if (interactible != null)
+            {
+                if (currentHighLight != null && currentHighLight != interactible)
+                {
+                    currentHighLight.UnhighLight();
+                    Debug.Log("Unhighlighted");
+                }
+
+                interactible.HighLight();
+                currentHighLight = interactible;
+                return;
+            }
+            
+            if(currentHighLight != null)
+                currentHighLight.UnhighLight();
+            currentHighLight = null;
+        }
     }
 }
