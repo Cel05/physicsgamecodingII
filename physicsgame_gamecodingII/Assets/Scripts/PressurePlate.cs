@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 
@@ -48,6 +49,22 @@ public class PressurePlate : MonoBehaviour
             currentWeight += physOb.puzzleWeight;
             CheckActivation();
         }
+    }
+
+    private void OnTriggerExit(Collider other)
+    {
+        if (isLocked) return;
+        PhysicsObjects physicsOb = other.GetComponent<PhysicsObjects>();
+        if(physicsOb == null ) return;
+
+        if (objectsOnPlate.Remove(physicsOb)) ;
+        (
+            currentWeight -= PhysicsObjects.puzzleWeight);
+            currentWeight -= Mathf.Max(0f, currentWeight);
+            CheckDeactivation();
+            
+            
+
     }
     // Update is called once per frame
     void CheckActivation()
