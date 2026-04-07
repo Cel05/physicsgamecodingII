@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class PhysicsObjects : MonoBehaviour
+public class PhysicsObject : MonoBehaviour
 {
     [Header("Mass and Motion")]
     [Range(0.1f, 100f)] 

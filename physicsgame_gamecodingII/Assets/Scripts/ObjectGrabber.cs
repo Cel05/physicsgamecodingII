@@ -3,31 +3,45 @@ using UnityEngine.InputSystem;
 
 public class ObjectGrabber : MonoBehaviour
 {
-    [Header("Grab Settings")] [Tooltip("How far away the player can grab objects from")]
-    public float grabRange;
+    [Header("Grab Settings")]
+    [Tooltip("How far away the player can grab objects from")]
+    public float grabRange = 4f;
 
-    [Tooltip("How fast the held object moves to the hold point. higher = snappier")]
+    [Tooltip("How fast the held object moves to the hold point (higher = snappier")]
     public float holdSmoothing = 15f;
-    
+
+    //the point in front of the camera where the object is held
     public Transform holdPoint;
 
+    [Header("Throw Settings")]
+    //how much force is applied when throwing
     public float throwForce = 15f;
+
+    Rigidbody heldObject; //the rigidbody we are currently holding
+    public bool isHolding = false; //are we currently holding something?
+
+    //for later after we do base script
+    //track the currently highlighted object so we can unhighlight it
+    InteractableObject currentHighlight;
+
     
-    private Rigidbody heldObject;
 
-    private bool isHolding = false;
-
-    private InteractibleObjects currentHighLight;
     // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void FixedUpdate()
+    void Update()
     {
-        if(isHolding && heldObject != null) MoveHeldObject();
+        //run the detection raycast every frame to update the highlight
+        //this is seperate from the grab raycast- it just checks what the player is looking at and highlight/unhighlights accordingly
+        //this is for later
+        UpdateHighlight();
+        
     }
 
     // Update is called once per frame
-    void Update()
+    void FixedUpdate()
     {
-        UpdateHighLight();
+        //fixed update runs in sync with the physics engine
+        //we move the held object here so it stays smooth and physics accurate
+        if(isHolding && heldObject != null) MoveHeldObject();
     }
 
     void TryGrab()
@@ -35,110 +49,182 @@ public class ObjectGrabber : MonoBehaviour
         Ray ray = new Ray(transform.position, transform.forward);
         RaycastHit hit;
 
-        Debug.DrawRay(transform.position, transform.forward * grabRange, Color.yellow, 0.5f);
+        //draw the ray in the scene view for debugging
+        //Debug.DrawRay(transform.position, transform.forward * grabRange, Color.green, 0.5f);
 
         if (Physics.Raycast(ray, out hit, grabRange))
         {
-            InteractibleObjects interactible = hit.collider.GetComponent<InteractibleObjects>();
-            Debug.Log("Grabbed" + interactible);
-            if (interactible != null)
+            //check if the hit object has the grabbable marker script
+            InteractableObject interactable = hit.collider.GetComponent<InteractableObject>();
+            if (interactable != null)
             {
-                Debug.Log("interactible does not equal null");
+                //get rigidbody so we can move it with physics
                 heldObject = hit.collider.GetComponent<Rigidbody>();
+                
+                //added this later
+                PhysicsObject physObj = heldObject.GetComponent<PhysicsObject>();
+                if (physObj != null) physObj.isHeld = true;
+                
+                
                 if (heldObject != null)
                 {
+                    //disable gravity so it floats in front of us while held
                     heldObject.useGravity = false;
-                    
+
+                    //freeze rotate so it doesnt spin around while carried
                     heldObject.freezeRotation = true;
-                    
+
+                    //zero out any existing velocity so it doesnt fly away
                     heldObject.linearVelocity = Vector3.zero;
                     heldObject.angularVelocity = Vector3.zero;
 
-                    interactible.UnhighLight();
-                    currentHighLight = null;
+                    //add later
+                    //unhighlight when grabbed- object is now in hand
+                    interactable.UnhighLight();
+                    currentHighlight = null;
 
                     isHolding = true;
-                    Debug.Log($"Grabbed{heldObject.name}");
+                    //Debug.Log($"Grabbed {heldObject.gameObject.name}");
                 }
             }
         }
-    }
 
+    }
+    //called every fixed update while holding an object
+    //smoothly moves the rigidbody toward the hold point
     void MoveHeldObject()
     {
         Vector3 targetPos = holdPoint.position;
-        Vector3 currentPOs = heldObject.position;
-        Vector3 newPos = Vector3.Lerp(currentPOs, targetPos, holdSmoothing * Time.fixedDeltaTime);
-        
+        Vector3 currentPos = heldObject.position;
+
+        //smoothly interpolate toward the hold point
+        //move position respects physics collision (object wont clip thru walls)
+        Vector3 newPos = Vector3.Lerp(currentPos, targetPos, holdSmoothing * Time.fixedDeltaTime);
+
         heldObject.MovePosition(newPos);
     }
 
+    //drop
+    //releases the object and restores normal physics behavior
     void DropObject()
     {
         if (heldObject == null) return;
         
+        //mark no longer as held
+        PhysicsObject physObj = heldObject.GetComponent<PhysicsObject>();
+        if (physObj != null) physObj.isHeld = false;
+        
+        //re-enable gravity and rotation
         heldObject.useGravity = true;
         heldObject.freezeRotation = false;
 
+        //zero velocity so it doesnt launch away on drop
+        heldObject.linearVelocity = Vector3.zero;
+        heldObject.angularVelocity = Vector3.zero;
+
         heldObject = null;
         isHolding = false;
-        Debug.Log("Dropped Object");
+
+        
+
     }
 
+    //releases the object and launches it forward using addforce
     void ThrowObject()
     {
-        if (heldObject == null) return;
         
+        if(heldObject == null) return;
+        
+        
+        //mark no longer as held
+        PhysicsObject physObj = heldObject.GetComponent<PhysicsObject>();
+        if (physObj != null) physObj.isHeld = false;
+
+        //re-enable physics first
         heldObject.useGravity = true;
         heldObject.freezeRotation = false;
-        
+
+        //apply force in the cirection the camera is facing
+        //forcemode.impulse applies the force instantly like a punch
+        //as oposed to forcemode.force which applies gradually over time
         heldObject.AddForce(transform.forward * throwForce, ForceMode.Impulse);
-        
+
         heldObject = null;
         isHolding = false;
-        Debug.Log("Threw Object");
+        //Debug.Log("Threw Object");
+
     }
 
     public void OnGrabPerformed(InputAction.CallbackContext context)
     {
-        if(isHolding) DropObject();
-        else TryGrab();
+        if(!context.performed) return;
+        if (isHolding) 
+        {
+            DropObject();
+
+
+        }
+        else
+        {
+            TryGrab();
+            
+        }
+
         
-        Debug.Log("Grabbed");
     }
 
     public void OnThrowPerformed(InputAction.CallbackContext context)
     {
-        if(isHolding) ThrowObject();
+        if ((!context.performed))
+        {
+            return;
+        }
+        if (isHolding) ThrowObject();
     }
 
-    void UpdateHighLight()
+    void UpdateHighlight()
     {
-        if (isHolding) return;
-        
+        //dont change highlights while holding an object
+        if(isHolding) return;
+
         Ray ray = new Ray(transform.position, transform.forward);
         RaycastHit hit;
+        //draw the detection ray in scene view (editor only)
         Debug.DrawRay(transform.position, transform.forward * grabRange, Color.red);
 
-        if (Physics.Raycast(ray, out hit, grabRange))
+
+        if(Physics.Raycast(ray, out hit, grabRange))
         {
-            InteractibleObjects interactible = hit.collider.GetComponent<InteractibleObjects>();
-            if (interactible != null)
+            InteractableObject interactable = hit.collider.GetComponent<InteractableObject>();
+            //Debug.Log("hit interactable");
+            if ((interactable != null))
             {
-                if (currentHighLight != null && currentHighLight != interactible)
+                //Debug.Log("current interactable: " +  interactable);
+                //Debug.Log("current highlight: " + currentHighlight);
+                //if we now looking at different object unhighlight the old one
+                if(currentHighlight != null && currentHighlight != interactable)
                 {
-                    currentHighLight.UnhighLight();
-                    Debug.Log("Unhighlighted");
+                    currentHighlight.UnhighLight();
+                    //Debug.Log("call unhighlight");
+                   
                 }
 
-                interactible.HighLight();
-                currentHighLight = interactible;
+                //highlight the new obj
+                interactable.HighLight();
+                //Debug.Log("call highlight");
+                currentHighlight = interactable;
                 return;
+
             }
-            
-            if(currentHighLight != null)
-                currentHighLight.UnhighLight();
-            currentHighLight = null;
+
+            //raycast hit nothing interactable - clear the highlight
+            if(currentHighlight != null)
+            {
+                //Debug.Log("did not hit interactable");
+                currentHighlight.UnhighLight();
+                currentHighlight = null;
+            }
         }
+        
     }
 }
