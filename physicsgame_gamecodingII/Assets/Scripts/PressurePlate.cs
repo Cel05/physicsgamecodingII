@@ -73,6 +73,7 @@ public class PressurePlate : MonoBehaviour
 
     private void OnTriggerStay(Collider other)
     {
+        Debug.Log("Pressure plate is staying");
         PhysicsObject physicsObj = other.GetComponent<PhysicsObject>();
         if (physicsObj == null) return;
 
