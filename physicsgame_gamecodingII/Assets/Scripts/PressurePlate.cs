@@ -34,6 +34,7 @@ public class PressurePlate : MonoBehaviour
     Vector3 platePressedPos;
 
     HashSet<PhysicsObject> objectsOnPlate = new HashSet<PhysicsObject>();
+    HashSet<PhysicsObject> countedObjects = new HashSet<PhysicsObject>();
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
@@ -54,20 +55,12 @@ public class PressurePlate : MonoBehaviour
        PhysicsObject physOb = other.GetComponent<PhysicsObject>();
        if (physOb == null) return;
 
-       if (physOb.isHeld) return; //so it doesnt go off when youre just holding it in the trigger area
-
-        //first simple version
-        /*currentWeight += physOb.puzzleWeight;
-        Debug.Log($"{other.gameObject.name} entered plate. total weight: {currentWeight}");
-        CheckActivation();*/
-
-       //this is instead adding it to a list at first just to make sure nothing gets double activated
-       //the above works too
-        if (objectsOnPlate.Add(physOb))
-        {
-            currentWeight += physOb.puzzleWeight;
-            CheckActivation();
-        }
+       if (!physOb.isHeld && countedObjects.Add(physOb))
+           
+       {
+           currentWeight += PhysicsObject.GetWeight();
+           CheckActivation();
+       }
 
     }
 
