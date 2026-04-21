@@ -54,29 +54,21 @@ public class PressurePlate : MonoBehaviour
     {
        PhysicsObject physOb = other.GetComponent<PhysicsObject>();
        if (physOb == null) return;
-
-       if (!physOb.isHeld && countedObjects.Add(physOb))
-           
-       {
-           currentWeight += PhysicsObject.GetWeight();
-           CheckActivation();
-       }
+       objectsOnPlate.Add(physOb);
+        
 
     }
 
     private void OnTriggerStay(Collider other)
     {
-        Debug.Log("Pressure plate is staying");
         PhysicsObject physicsObj = other.GetComponent<PhysicsObject>();
         if (physicsObj == null) return;
 
-        //ifnore if still being held
-        if(physicsObj.isHeld) return;
-
-        if(objectsOnPlate.Add(physicsObj))
+        if(!physicsObj.isHeld && countedObjects.Add(physicsObj))
         {
-            currentWeight += physicsObj.puzzleWeight;
+            currentWeight += physicsObj.GetWeight();
             CheckActivation();
+            //Debug.Log()
         }
     }
 
@@ -86,12 +78,14 @@ public class PressurePlate : MonoBehaviour
         PhysicsObject physicsObj = other.GetComponent<PhysicsObject>();
         if (physicsObj == null) return;
 
-        if (objectsOnPlate.Remove(physicsObj))
+        if (countedObjects.Remove(physicsObj))
         {
-            currentWeight -= physicsObj.puzzleWeight;
+            currentWeight -= physicsObj.GetWeight();
             currentWeight = Mathf.Max(0f, currentWeight);
             CheckDeactivation();
         }
+
+        objectsOnPlate.Remove(physicsObj);
     }
 
 
