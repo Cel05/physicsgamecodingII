@@ -1,16 +1,29 @@
 using UnityEngine;
 
-public class BallSpawn : MonoBehaviour
+public class BallSpawner : MonoBehaviour
 {
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
-    {
-        
-    }
+    public GameObject ballPrefab;
+    public Transform spawnPoint;
 
-    // Update is called once per frame
+    public float forwardForce = 0f;
+
     void Update()
     {
-        
+        if (Input.GetKeyDown(KeyCode.R))
+        {
+            SpawnBall();
+        }
+    }
+
+    void SpawnBall()
+    {
+        GameObject ball = Instantiate(ballPrefab, spawnPoint.position, spawnPoint.rotation);
+
+        Rigidbody rb = ball.GetComponent<Rigidbody>();
+
+        if (rb != null && forwardForce > 0f)
+        {
+            rb.AddForce(spawnPoint.forward * forwardForce, ForceMode.Impulse);
+        }
     }
 }
