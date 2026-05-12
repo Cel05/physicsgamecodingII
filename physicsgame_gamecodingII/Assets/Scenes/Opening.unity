@@ -226,7 +226,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 65, y: 27, z: 1306}
-  m_LocalScale: {x: 2021.7097, y: 1260.2604, z: 679.698}
+  m_LocalScale: {x: 3475.5212, y: 1260.2604, z: 679.698}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
@@ -3168,7 +3168,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7336ed2c113c547ed9aa14bbceced4e1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Startbuttonscene
-  sceneName: Ingame
+  gameSceneName: LV.1
 --- !u!4 &1790811366
 Transform:
   m_ObjectHideFlags: 0
