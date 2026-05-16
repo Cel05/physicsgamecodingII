@@ -23,13 +23,11 @@ MonoBehaviour:
   - m_enabled: 1
     m_path: Assets/Scenes/Opening.unity
   - m_enabled: 1
-    m_path: Assets/Scenes/Tutorial.unity
-  - m_enabled: 1
     m_path: Assets/Scenes/LV.1.unity
   - m_enabled: 1
     m_path: Assets/Scenes/LV.2.unity
   - m_enabled: 1
-    m_path: Assets/Scenes/Ending.unity
+    m_path: Assets/Scenes/End.unity
   m_HasScriptingDefines: 0
   m_ScriptingDefines: []
   m_PlayerSettingsYaml:

@@ -68,15 +68,6 @@
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": false
-                },
-                {
-                    "name": "Reset",
-                    "type": "Button",
-                    "id": "e83a4b0d-8231-464f-ba6c-0cb1ccd185eb",
-                    "expectedControlType": "",
-                    "processors": "",
-                    "interactions": "",
-                    "initialStateCheck": false
                 }
             ],
             "bindings": [
@@ -352,17 +343,6 @@
                     "processors": "",
                     "groups": "",
                     "action": "Throw",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
-                    "id": "96852348-9689-48ab-b588-e5b3340a0e50",
-                    "path": "<Keyboard>/l",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "",
-                    "action": "Reset",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }
