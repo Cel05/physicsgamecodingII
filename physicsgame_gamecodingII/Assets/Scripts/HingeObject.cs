@@ -41,7 +41,7 @@ public class HingeObject : MonoBehaviour
             OnReachMax?.Invoke();
             Debug.Log(gameObject.name + "hinge reached max angle");
         }
-         if (!minEventFired && currentAngle <= minAngle + eventThreshold)
+        else if (!minEventFired && currentAngle <= minAngle + eventThreshold)
         {
             minEventFired = true;
             maxEventFired = false;
