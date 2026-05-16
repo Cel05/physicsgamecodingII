@@ -63,12 +63,6 @@ public class PhysicsObject : MonoBehaviour
     {
         if(rb != null) ApplyRigidbodySettings();
     }
-    
-    public float GetWeight()
-    {
-        if(puzzleWeight >= 0f) return  puzzleWeight;
-        return mass;
-    }
 
   
 }
