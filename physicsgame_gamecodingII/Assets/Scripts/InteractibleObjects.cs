@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class InteractableObject : MonoBehaviour
+public class InteractibleObjects : MonoBehaviour
 {
     public Color highLightColor = new Color(1f, 0.95f, 0.6f);
 
@@ -34,7 +34,7 @@ public class InteractableObject : MonoBehaviour
     {
         if (isHighLighted || objectRenderer == null)
         {
-            //Debug.Log("no obj renderer & ishighlighted is true");
+            Debug.Log("no obj renderer & ishighlighted is true");
             return;
         }
 
