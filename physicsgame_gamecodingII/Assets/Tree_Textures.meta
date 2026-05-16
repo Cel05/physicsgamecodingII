@@ -1,5 +1,9 @@
 fileFormatVersion: 2
+<<<<<<<< HEAD:physicsgame_gamecodingII/Assets/Tree_Textures.meta
 guid: 8dac178f755c64d10bd55b9d6f89cd86
+========
+guid: ba062aa6c92b140379dbc06b43dd3b9b
+>>>>>>>> parent of 3fa06b0c (made the map, added slopes and made the soft body):physicsgame_gamecodingII/Assets/TutorialInfo.meta
 folderAsset: yes
 DefaultImporter:
   externalObjects: {}
