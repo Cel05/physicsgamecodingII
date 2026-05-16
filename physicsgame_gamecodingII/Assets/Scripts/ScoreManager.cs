@@ -119,6 +119,7 @@ public class ScoreManager : MonoBehaviour
         //Restart current level after game over
         string currentSceneName = SceneManager.GetActiveScene().name;
         StartCoroutine(LoadSceneAfterDelay(currentSceneName));
+        
     }
 
     void SaveCurrentLevelScore()
